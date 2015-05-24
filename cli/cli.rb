@@ -29,10 +29,15 @@ class DinghyCLI < Thor
   desc "up", "start the Docker VM and services"
   def up
     vagrant = Vagrant.new
-    unfs = Unfs.new
     vagrant.up(options.dup)
-    unfs.up
-    vagrant.mount(unfs)
+
+    unfsd_shares.each { |share| 
+      print "Sharing: ", share, "\n" 
+      unfs = Unfs.new(share)
+      unfs.up
+      vagrant.mount(unfs)
+    }
+
     vagrant.install_docker_keys
     Dnsmasq.new.up
     proxy = options[:proxy] || (options[:proxy].nil? && !proxy_disabled?)
@@ -111,5 +116,19 @@ class DinghyCLI < Thor
 
   def proxy_disabled?
     preferences[:proxy_disabled] == true
+  end
+
+  def unfsd_shares
+    paths = Array.new
+
+    exportsfile = File.join(File.dirname(__FILE__), "..", "etc", "dinghy-nfs-exports")
+    file = File.new(exportsfile, "r")
+    while (line = file.gets)
+        # make sure to use only the path - but also support whitespaces
+        paths.push line.scan(/(?:\w|"[^"]*")+/)[0]
+    end
+    file.close
+
+    return paths
   end
 end
