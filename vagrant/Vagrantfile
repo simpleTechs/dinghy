@@ -54,15 +54,4 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     sudo /etc/init.d/services/crond start
     echo '*/5 * * * * /usr/local/bin/ntpclient -s -h pool.ntp.org' | sudo crontab -
   EOT
-
-  # Mount the NFS volume from our own unfs daemon
-  config.vm.provision :shell, run: "always" do |s|
-    mount_dir = ENV.fetch("HOME")
-    s.inline = <<-EOT
-      echo Preparing #{mount_dir} NFS mount
-      sudo umount #{mount_dir} 2> /dev/null
-      sudo mkdir -p #{mount_dir}
-      sudo chown docker #{mount_dir}
-    EOT
-  end
 end

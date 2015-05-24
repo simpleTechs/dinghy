@@ -56,7 +56,7 @@ https://www.vagrantup.com
 
   def mount(unfs)
     puts "Mounting NFS #{unfs.mount_dir}"
-    ssh("sudo mount -t nfs #{HOST_IP}:#{unfs.mount_dir} #{unfs.mount_dir} -o nfsvers=3,udp,mountport=19321,port=19321,nolock,hard,intr")
+    ssh("sudo umount #{unfs.mount_dir} 2> /dev/null; sudo mkdir -p #{unfs.mount_dir}; sudo chown docker #{unfs.mount_dir}; sudo mount -t nfs #{HOST_IP}:#{unfs.mount_dir} #{unfs.mount_dir} -o nfsvers=3,udp,mountport=19321,port=19321,nolock,hard,intr")
   end
 
   def halt
