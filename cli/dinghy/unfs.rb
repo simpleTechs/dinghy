@@ -6,6 +6,10 @@ require 'dinghy/plist'
 class Unfs
   include RootPlist
 
+  def initialize(dir=HOME)
+    @dir = dir
+  end
+
   def up
     super
     wait_for_unfs
@@ -32,7 +36,7 @@ class Unfs
   end
 
   def mount_dir
-    HOME
+    return @dir
   end
 
   def plist_name
